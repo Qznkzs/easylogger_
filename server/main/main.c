@@ -32,10 +32,77 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
+#define SOCKET_NAME        "/home/thd/test/elog/tmp/server" // 定义 socket 文件路径
+
+static void init_easylogger(void);
+static int init_socket(void);
+static int parse_msg(char *buf, const char *src);
 static void test_elog(void);
+int isContinue = 1;
 
-int main(void) {
+int main(void)
+{
+    int ret;
+    int sockfd;
+    int connect_sockfd;
+    char recv_buffer[800];
+    char msg_buffer[700];
+    init_easylogger();
+    sockfd = init_socket();
+    if (sockfd < 0)
+    {
+        return -1;
+    }
+    while(isContinue)
+    {
+	    printf("server waiting for connection...\n");
+        // 接收客户端连接
+        connect_sockfd = accept(sockfd, NULL, NULL);
+        if (connect_sockfd == -1)
+        {
+            continue;
+        }
+        memset(recv_buffer, '\0', 800);
+        memset(msg_buffer, '\0', 700);
+        ret = read(connect_sockfd, recv_buffer, 800);
+        if (ret < 1)
+        {
+            close(connect_sockfd);
+            continue;
+        }
+        parse_msg(msg_buffer, recv_buffer);
+        switch (recv_buffer[0])
+        {
+            case 'A':
+                log_a(msg_buffer);
+                break;
+            case 'E':
+                log_e(msg_buffer);
+                break;
+            case 'W':
+                log_w(msg_buffer);
+                break;
+            case 'I':
+                log_i(msg_buffer);
+                break;
+            case 'D':
+                log_d(msg_buffer);
+                break;
+            case 'V':
+                log_v(msg_buffer);
+        }
+        close(connect_sockfd);
+    }
+    close(sockfd);
+    return EXIT_SUCCESS;
+}
+
+void init_easylogger(void)
+{
     /* close printf buffer */
     setbuf(stdout, NULL);
     /* initialize EasyLogger */
@@ -65,9 +132,53 @@ int main(void) {
 //    elog_set_filter_tag_lvl("main", ELOG_LVL_WARN);
 
     /* test logger output */
-    test_elog();
+}
 
-    return EXIT_SUCCESS;
+int init_socket(void)
+{
+    struct sockaddr_un name;
+    int ret;
+    // 创建 socket
+    int sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (sockfd == -1) 
+    {
+        return -1;
+    }
+
+    // 删除 socket 文件，以防止程序异常退出导致文件未删除
+    unlink(SOCKET_NAME);
+
+    // 设置 socket 地址
+    memset(&name, 0, sizeof(struct sockaddr_un));
+    name.sun_family = AF_UNIX;
+    strncpy(name.sun_path, SOCKET_NAME, sizeof(name.sun_path) - 1);
+
+    // 绑定 socket
+    ret = bind(sockfd, (const struct sockaddr *) &name, sizeof(struct sockaddr_un));
+    if (ret == -1) 
+    {
+        return -2;
+    }
+
+    // 监听 socket
+    ret = listen(sockfd, 20);
+    if (ret == -1)
+    {
+        return -3;
+    }
+    
+    return sockfd;
+}
+
+int parse_msg(char *buf, const char *src)
+{
+    int ret = 0;
+    if (NULL == src || NULL == buf)
+    {
+        return -1;
+    }
+    strncpy(buf, src + 2, 700 - 1);
+    return ret;
 }
 
 /**

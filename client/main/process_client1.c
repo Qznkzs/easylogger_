@@ -17,8 +17,6 @@ int main(void)
         snprintf(log, 100, "%s:%d", "client1", count);
         log_a(log);
         sleep(1);
-        log_f(log);
-        sleep(1);
         log_e(log);
         sleep(1);
         log_w(log);
@@ -26,6 +24,8 @@ int main(void)
         log_i(log);
         sleep(1);
         log_d(log);
+        sleep(1);
+        log_v(log);
         sleep(1);
     }
     return 0;

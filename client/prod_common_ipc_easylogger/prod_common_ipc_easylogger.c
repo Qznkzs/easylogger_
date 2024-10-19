@@ -51,6 +51,7 @@ static int send_log_to_server(const char *log)
     return 0;
 }
 
+#if defined(NEW_STANDARD)
 int send_assert_log_to_server(const char *original_log)
 {
     int ret = 0;
@@ -195,3 +196,151 @@ int send_debug_log_to_server(const char *original_log)
     }
     return ret;
 }
+
+#else
+int send_assert_log_to_server(const char *original_log)
+{
+    int ret = 0;
+    char assert_log[LOG_BUFFER_LEN] = {0};
+    memset(assert_log, '\0', LOG_BUFFER_LEN);
+    snprintf(assert_log, LOG_BUFFER_LEN-1, "%s,%s", ASSERT_HEAD, original_log);
+    ret = send_log_to_server(assert_log);
+    switch (ret)
+    {
+        case 0:
+            //printf("Send log successfully!");
+            break;
+        case -1:
+            //printf("Create socket fail!");
+            break;
+        case -2:
+            //printf("Connet to server fail!");
+            break;
+        default:
+            //printf("Unkown!");
+            break;
+    }
+
+}
+
+int send_error_log_to_server(const char *original_log)
+{
+    int ret = 0;
+    char error_log[LOG_BUFFER_LEN] = {0};
+    snprintf(error_log, LOG_BUFFER_LEN, "%s,%s", ERROR_HEAD, original_log);
+    ret = send_log_to_server(error_log);
+    switch (ret)
+    {
+        case 0:
+            //printf("Send log successfully!");
+            break;
+        case -1:
+            //printf("Create socket fail!");
+            break;
+        case -2:
+            //printf("Connet to server fail!");
+            break;
+        default:
+            //printf("Unkown!");
+            break;
+    }
+    return ret;
+}
+
+int send_warn_log_to_server(const char *original_log)
+{
+    int ret = 0;
+    char warn_log[LOG_BUFFER_LEN] = {0};
+    snprintf(warn_log, LOG_BUFFER_LEN, "%s,%s", WARN_HEAD, original_log);
+    ret = send_log_to_server(warn_log);
+    switch (ret)
+    {
+        case 0:
+            //printf("Send log successfully!");
+            break;
+        case -1:
+            //printf("Create socket fail!");
+            break;
+        case -2:
+            //printf("Connet to server fail!");
+            break;
+        default:
+            //printf("Unkown!");
+            break;
+    }
+    return ret;
+}
+
+int send_info_log_to_server(const char *original_log)
+{
+    int ret = 0;
+    char info_log[LOG_BUFFER_LEN] = {0};
+    snprintf(info_log, LOG_BUFFER_LEN, "%s,%s", INFO_HEAD, original_log);
+    ret = send_log_to_server(info_log);
+    switch (ret)
+    {
+        case 0:
+            //printf("Send log successfully!");
+            break;
+        case -1:
+            //printf("Create socket fail!");
+            break;
+        case -2:
+            //printf("Connet to server fail!");
+            break;
+        default:
+            //printf("Unkown!");
+            break;
+    }
+    return ret;
+}
+
+int send_debug_log_to_server(const char *original_log)
+{
+    int ret = 0;
+    char debug_log[LOG_BUFFER_LEN] = {0};
+    snprintf(debug_log, LOG_BUFFER_LEN, "%s,%s", DEBUG_HEAD, original_log);
+    ret = send_log_to_server(debug_log);
+    switch (ret)
+    {
+        case 0:
+            //printf("Send log successfully!");
+            break;
+        case -1:
+            //printf("Create socket fail!");
+            break;
+        case -2:
+            //printf("Connet to server fail!");
+            break;
+        default:
+            //printf("Unkown!");
+            break;
+    }
+    return ret;
+}
+
+int send_verbose_log_to_server(const char *original_log)
+{
+    int ret = 0;
+    char verbose_log[LOG_BUFFER_LEN] = {0};
+    snprintf(verbose_log, LOG_BUFFER_LEN, "%s,%s", VERBOSE_HEAD, original_log);
+    ret = send_log_to_server(verbose_log);
+    switch (ret)
+    {
+        case 0:
+            //printf("Send log successfully!");
+            break;
+        case -1:
+            //printf("Create socket fail!");
+            break;
+        case -2:
+            //printf("Connet to server fail!");
+            break;
+        default:
+            //printf("Unkown!");
+            break;
+    }
+    return ret;
+}
+
+#endif

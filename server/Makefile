@@ -10,7 +10,7 @@ OBJ += $(patsubst %.c, %.o, $(wildcard ./easylogger/plugins/file/*.c))
 OBJ += $(patsubst %.c, %.o, $(wildcard ./easylogger/port/*.c))
 
 CFLAGS = -O0 -g3 -Wall
-target = EasyLoggerLinuxDemo
+target = server.out
 
 all:$(OBJ)
 	$(CC) $^ -o $(target) $(LIB)
